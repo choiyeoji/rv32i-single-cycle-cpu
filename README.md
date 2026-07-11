@@ -456,82 +456,25 @@ ALU 연산 결과와 Memory Read Data가 목적지 Register에
 
 ---
 
-## ⚠️ 문제 해결
+## 🔍 구현 시 고려 사항
 
-### Signed / Unsigned 비교 구분
+### Signed / Unsigned 연산 구분
 
-<table>
-  <tr>
-    <th width="120">구분</th>
-    <th>내용</th>
-  </tr>
-  <tr>
-    <td align="center"><b>문제</b></td>
-    <td><code>SLT</code>와 <code>SLTU</code>, Signed Branch와 Unsigned Branch에서 비교 결과가 잘못 출력될 수 있음</td>
-  </tr>
-  <tr>
-    <td align="center"><b>원인</b></td>
-    <td>동일한 비트 패턴이라도 Signed 값과 Unsigned 값의 해석 방식이 다름</td>
-  </tr>
-  <tr>
-    <td align="center"><b>해결</b></td>
-    <td>명령어 종류에 따라 Signed 비교와 Unsigned 비교 연산을 분리하여 구현</td>
-  </tr>
-  <tr>
-    <td align="center"><b>결과</b></td>
-    <td><code>SLT</code>, <code>SLTU</code> 및 Branch 명령어별 비교 결과를 정상적으로 검증</td>
-  </tr>
-</table>
+`SLT`와 `SLTU`, Signed Branch와 Unsigned Branch는  
+동일한 비트 패턴이라도 데이터 해석 방식이 다르므로  
+명령어에 따라 Signed 연산과 Unsigned 연산을 구분하여 구현했습니다.
 
-### Shift 연산의 부호 처리
+### Shift 연산 구분
 
-<table>
-  <tr>
-    <th width="120">구분</th>
-    <th>내용</th>
-  </tr>
-  <tr>
-    <td align="center"><b>문제</b></td>
-    <td><code>SRL</code>과 <code>SRA</code>에서 음수 데이터의 Shift 결과가 다르게 처리되어야 함</td>
-  </tr>
-  <tr>
-    <td align="center"><b>원인</b></td>
-    <td><code>SRL</code>은 빈 비트를 0으로 채우고, <code>SRA</code>는 부호 비트를 유지해야 함</td>
-  </tr>
-  <tr>
-    <td align="center"><b>해결</b></td>
-    <td>논리 우측 Shift와 산술 우측 Shift 연산을 ALU 내부에서 구분하여 구현</td>
-  </tr>
-  <tr>
-    <td align="center"><b>결과</b></td>
-    <td>음수 데이터에 대한 <code>SRL</code>과 <code>SRA</code> 결과가 각각 정상적으로 출력됨</td>
-  </tr>
-</table>
+`SRL`은 빈 비트를 `0`으로 채우고,  
+`SRA`는 최상위 부호 비트를 유지하도록  
+논리 우측 Shift와 산술 우측 Shift 연산을 구분했습니다.
 
-### Branch PC 선택 제어
+### Branch에 따른 PC 선택
 
-<table>
-  <tr>
-    <th width="120">구분</th>
-    <th>내용</th>
-  </tr>
-  <tr>
-    <td align="center"><b>문제</b></td>
-    <td>Branch 조건 결과와 PC 선택 신호가 정확히 연결되지 않으면 잘못된 명령어 주소로 이동할 수 있음</td>
-  </tr>
-  <tr>
-    <td align="center"><b>원인</b></td>
-    <td>Branch 명령어마다 비교 조건이 다르며, 조건 결과에 따라 Next PC 선택이 변경되어야 함</td>
-  </tr>
-  <tr>
-    <td align="center"><b>해결</b></td>
-    <td>Branch 조건 판단 결과와 Branch Control 신호를 조합하여 <code>PC + 4</code> 또는 Branch Target을 선택</td>
-  </tr>
-  <tr>
-    <td align="center"><b>결과</b></td>
-    <td>조건 만족 여부에 따라 PC가 순차 주소 또는 Branch Target으로 정상 변경됨</td>
-  </tr>
-</table>
+Branch 조건 결과에 따라 다음 명령어 주소로  
+`PC + 4` 또는 Branch Target Address가 선택되도록  
+Next PC 제어 로직을 구성했습니다.
 
 ---
 
